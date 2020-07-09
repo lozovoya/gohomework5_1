@@ -23,7 +23,7 @@ func main() {
 		15, 30_00)
 
 	fmt.Println(pngTr.Card2Card("1111 1111 1111 1111", "000 0000 0000 0000", 1_000_00))
-	err := pngTr.Transfer("1111 1111 1111 1111", "000 0000 0000 0000", 1_000_00)
+	err := pngTr.Transfer("1111 1111 1111 1111", "000 0000 0000 0000", 1_000_000_00)
 	if err != nil {
 		switch err {
 		case transfer.ErrorSourceCardNotEnoughMoney:

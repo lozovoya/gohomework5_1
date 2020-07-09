@@ -119,3 +119,61 @@ func TestService_Card2Card(t *testing.T) {
 		})
 	}
 }
+
+func TestService_Transfer(t *testing.T) {
+	type fields struct {
+		CardSvc       *card.Service
+		ItoICommision int64
+		ItoIMin       int64
+		ItoECommision int64
+		ItoEMin       int64
+		EtoICommision int64
+		EtoIMin       int64
+		EtoECommision int64
+		EtoEMin       int64
+	}
+	type args struct {
+		from   string
+		to     string
+		amount int64
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		wantErr error
+	}{
+		{
+			name: "ItoI test Error",
+			args: args{
+				from:   "1111 1111 1111 1111",
+				to:     "0000 0000 0000 0000",
+				amount: 1_000_000_000_00,
+			},
+			wantErr: ErrorSourceCardNotEnoughMoney,
+		},
+	}
+
+	CardSvc := card.NewService("qqq")
+	CardSvc.IssueCard("master", 100_000_00, "0000 0000 0000 0000", "rub")
+	CardSvc.IssueCard("visa", 15_000_00, "1111 1111 1111 1111", "rub")
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			s := &Service{
+				CardSvc:       CardSvc,
+				ItoICommision: 0,
+				ItoIMin:       0,
+				ItoECommision: 5,
+				ItoEMin:       10_00,
+				EtoICommision: 0,
+				EtoIMin:       0,
+				EtoECommision: 15,
+				EtoEMin:       30_00,
+			}
+			if err := s.Transfer(tt.args.from, tt.args.to, tt.args.amount); err != tt.wantErr {
+				t.Errorf("Transfer() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
