@@ -40,11 +40,22 @@ func (s *Service) SearchByNumber(number string) *Card {
 	return nil
 }
 
-func (s *Service) FindByNumber(number string) (*Card, bool) {
+//func (s *Service) FindByNumber(number string) (*Card, bool) {
+//	if strings.HasPrefix(number, "510621") {
+//		for _, card := range s.Cards {
+//			if card.Number == number {
+//				return card, true
+//			}
+//		}
+//	}
+//	return nil, false
+//}
+
+func (s *Service) FindByNumber(number string) *Card {
 	for _, card := range s.Cards {
 		if card.Number == number {
-			return card, true
+			return card
 		}
 	}
-	return nil, false
+	return nil
 }
