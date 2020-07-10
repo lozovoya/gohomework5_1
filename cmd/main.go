@@ -22,8 +22,7 @@ func main() {
 		0, 0,
 		15, 30_00)
 
-	fmt.Println(pngTr.Card2Card("5106 2111 1111 1111", "5106 2100 0000 0000", 1_000_00))
-	err := pngTr.Transfer("5106 2111 1111 1111", "5106 2100 0000 0000", 1_000_00)
+	total, err := pngTr.Card2Card("5106 2111 1111 1111", "5106 2100 0000 0000", 1_000_000_00)
 	if err != nil {
 		switch err {
 		case transfer.ErrorSourceCardNotEnoughMoney:
@@ -35,6 +34,7 @@ func main() {
 		default:
 			fmt.Println("General Error")
 		}
-
+	} else {
+		fmt.Printf("Общая сумма перевода с комиссией составила %v\n", total)
 	}
 }

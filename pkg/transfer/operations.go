@@ -33,19 +33,25 @@ func NewService(cardSvc *card.Service, itoICommision int64, itoIMin int64, itoEC
 		EtoECommision: etoECommision, EtoEMin: etoEMin}
 }
 
-func (s *Service) Card2Card(from string, to string, amount int64) (total int64, ok bool) {
-	fromCard := s.CardSvc.SearchByNumber(from)
-	toCard := s.CardSvc.SearchByNumber(to)
+func (s *Service) Card2Card(from string, to string, amount int64) (int64, error) {
+	fromCard := s.CardSvc.FindByNumber(from)
+	toCard := s.CardSvc.FindByNumber(to)
+
+	if strings.HasPrefix(from, bankCode) && (fromCard == nil) {
+		return 0, ErrorSourceCardNotFound
+	}
+	if strings.HasPrefix(to, bankCode) && (toCard == nil) {
+		return 0, ErrorDestCardNotFound
+	}
 
 	// I to I
 	if (fromCard != nil) && (toCard != nil) {
 		if fromCard.Balance < amount {
-			return amount, false
+			return 0, ErrorSourceCardNotEnoughMoney
 		}
 		fromCard.Balance -= amount
 		toCard.Balance += amount
-		return amount, true
-
+		return amount, nil
 	}
 
 	// I to E
@@ -53,17 +59,16 @@ func (s *Service) Card2Card(from string, to string, amount int64) (total int64, 
 		commission := amount * s.ItoECommision / 1000
 		total := amount + commission
 		if fromCard.Balance < total {
-			return total, false
+			return 0, ErrorSourceCardNotEnoughMoney
 		}
 		fromCard.Balance -= total
-		return total, true
-
+		return total, nil
 	}
 
 	// E to I
 	if (fromCard == nil) && (toCard != nil) {
 		toCard.Balance += amount
-		return amount, true
+		return 0, nil
 	}
 
 	// E to E
@@ -71,65 +76,10 @@ func (s *Service) Card2Card(from string, to string, amount int64) (total int64, 
 		commission := amount * s.EtoECommision / 1000
 		if commission > s.EtoEMin {
 			total := amount + commission
-			return total, true
+			return total, nil
 		}
-		total = amount + s.EtoEMin
-		return total, true
-
+		total := amount + s.EtoEMin
+		return total, nil
 	}
-	return 0, false
-}
-
-func (s *Service) Transfer(from string, to string, amount int64) error {
-
-	fromCard := s.CardSvc.FindByNumber(from)
-	toCard := s.CardSvc.FindByNumber(to)
-
-	if strings.HasPrefix(from, bankCode) && (fromCard == nil) {
-		return ErrorSourceCardNotFound
-	}
-	if strings.HasPrefix(to, bankCode) && (toCard == nil) {
-		return ErrorDestCardNotFound
-	}
-
-	// I to I
-	if (fromCard != nil) && (toCard != nil) {
-		if fromCard.Balance < amount {
-			return ErrorSourceCardNotEnoughMoney
-		}
-		fromCard.Balance -= amount
-		toCard.Balance += amount
-		return nil
-
-	}
-
-	// I to E
-	if (fromCard != nil) && (toCard == nil) {
-		commission := amount * s.ItoECommision / 1000
-		total := amount + commission
-		if fromCard.Balance < total {
-			return ErrorSourceCardNotEnoughMoney
-		}
-		fromCard.Balance -= total
-		return nil
-
-	}
-
-	// E to I
-	if (fromCard == nil) && (toCard != nil) {
-		toCard.Balance += amount
-		return nil
-	}
-
-	// E to E
-	if (fromCard == nil) && (toCard == nil) {
-		commission := amount * s.EtoECommision / 1000
-		if commission > s.EtoEMin {
-			//	total := amount + commission
-			return nil
-		}
-		//	total := amount + s.EtoEMin
-		return nil
-	}
-	return nil
+	return 0, nil
 }
