@@ -2,7 +2,6 @@ package card
 
 import (
 	"errors"
-	"fmt"
 	"strconv"
 	"strings"
 )
@@ -81,6 +80,5 @@ func IsValid(cardNumber string) error {
 		return nil
 	}
 
-	fmt.Println(sum)
 	return ErrorWrongCardNumber
 }
