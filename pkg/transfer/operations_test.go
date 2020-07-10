@@ -66,7 +66,7 @@ func TestService_Card2Card(t *testing.T) {
 				to:     "5106 2100 0000 0000",
 				amount: 1_000_00,
 			},
-			want:    0,
+			want:    1_000_00,
 			wantErr: nil,
 		},
 	}
