@@ -9,8 +9,8 @@ import (
 func main() {
 
 	png := *card.NewService("Penguin Bank")
-	png.IssueCard("master", 100_000_00, "5106 2100 0000 0000", "rub")
-	png.IssueCard("visa", 100_000_00, "5106 2111 1111 1111", "rub")
+	png.IssueCard("master", 100_000_00, "5106 2100 0000 0003", "rub")
+	png.IssueCard("visa", 100_000_00, "5106 2111 1111 1116", "rub")
 	png.IssueCard("master", 10_000_00, "5106 2122 2222 2222", "rub")
 	png.IssueCard("visa", 15_000_00, "5106 2133 3333 3333", "rub")
 	png.IssueCard("master", 50_000_00, "5106 2144 4444 4444", "rub")
@@ -22,7 +22,7 @@ func main() {
 		0, 0,
 		15, 30_00)
 
-	total, err := pngTr.Card2Card("5106 2111 1111 1111", "5106 2100 0000 0000", 1_000_000_00)
+	total, err := pngTr.Card2Card("5106 2111 1111 1116", "5106 2100 3333 0004", 1_000_00)
 	if err != nil {
 		switch err {
 		case transfer.ErrorSourceCardNotEnoughMoney:
@@ -31,10 +31,13 @@ func main() {
 			fmt.Println("Check from card")
 		case transfer.ErrorDestCardNotFound:
 			fmt.Println("Check destination card")
+		case card.ErrorWrongCardNumber:
+			fmt.Println("Check card number")
 		default:
 			fmt.Println("General Error")
 		}
 	} else {
 		fmt.Printf("Общая сумма перевода с комиссией составила %v\n", total)
 	}
+
 }

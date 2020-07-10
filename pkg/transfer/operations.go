@@ -34,6 +34,11 @@ func NewService(cardSvc *card.Service, itoICommision int64, itoIMin int64, itoEC
 }
 
 func (s *Service) Card2Card(from string, to string, amount int64) (int64, error) {
+
+	if (card.IsValid(from) != nil) || (card.IsValid(to) != nil) {
+		return 0, card.ErrorWrongCardNumber
+	}
+
 	fromCard := s.CardSvc.FindByNumber(from)
 	toCard := s.CardSvc.FindByNumber(to)
 

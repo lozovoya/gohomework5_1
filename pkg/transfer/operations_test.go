@@ -30,10 +30,10 @@ func TestService_Card2Card(t *testing.T) {
 		wantErr error
 	}{
 		{
-			name: "ItoI test Error",
+			name: "ItoI, not enough money",
 			args: args{
-				from:   "5106 2111 1111 1111",
-				to:     "5106 2100 0000 0000",
+				from:   "5106 2111 1111 1116",
+				to:     "5106 2100 0000 0003",
 				amount: 1_000_000_000_00,
 			},
 			want:    0,
@@ -42,8 +42,8 @@ func TestService_Card2Card(t *testing.T) {
 		{
 			name: "ItoI, from card not found",
 			args: args{
-				from:   "5106 2100 1111 1111",
-				to:     "5106 2100 0000 0000",
+				from:   "5106 2100 3333 0004",
+				to:     "5106 2100 0000 0003",
 				amount: 1_000_000_00,
 			},
 			want:    0,
@@ -52,8 +52,8 @@ func TestService_Card2Card(t *testing.T) {
 		{
 			name: "ItoI, to card not found",
 			args: args{
-				from:   "5106 2111 1111 1111",
-				to:     "5106 2111 0000 0000",
+				from:   "5106 2111 1111 1116",
+				to:     "5106 2100 3333 0004",
 				amount: 1_000_000_00,
 			},
 			want:    0,
@@ -62,18 +62,28 @@ func TestService_Card2Card(t *testing.T) {
 		{
 			name: "ItoI, succesful",
 			args: args{
-				from:   "5106 2111 1111 1111",
-				to:     "5106 2100 0000 0000",
+				from:   "5106 2111 1111 1116",
+				to:     "5106 2100 0000 0003",
 				amount: 1_000_00,
 			},
 			want:    1_000_00,
 			wantErr: nil,
 		},
+		{
+			name: "ItoI, wrong card number",
+			args: args{
+				from:   "5106 2111 1111 0006",
+				to:     "5106 2100 0000 0003",
+				amount: 1_000_00,
+			},
+			want:    0,
+			wantErr: card.ErrorWrongCardNumber,
+		},
 	}
 
 	CardSvc := card.NewService("qqq")
-	CardSvc.IssueCard("master", 100_000_00, "5106 2100 0000 0000", "rub")
-	CardSvc.IssueCard("visa", 15_000_00, "5106 2111 1111 1111", "rub")
+	CardSvc.IssueCard("master", 100_000_00, "5106 2100 0000 0003", "rub")
+	CardSvc.IssueCard("visa", 15_000_00, "5106 2111 1111 1116", "rub")
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
